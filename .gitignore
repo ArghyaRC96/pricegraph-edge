@@ -1,0 +1,17 @@
+
+# Generated project artifacts
+data/processed/
+models/*.pkl
+models/*.joblib
+
+# Secrets
+.env
+.streamlit/secrets.toml
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Jupyter
+.ipynb_checkpoints/
