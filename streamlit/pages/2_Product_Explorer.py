@@ -39,7 +39,30 @@ if item_recs is not None and len(item_recs):
                       xaxis_title="Store", yaxis_title="Price", legend_title_text="")
     st.plotly_chart(fig, use_container_width=True)
     view = ["store_id","current_price","recommended_price","price_change_pct","predicted_revenue_gain_pct","recommendation_reliability"]
-    st.dataframe(item_recs[view].sort_values("predicted_revenue_gain_pct", ascending=False), use_container_width=True, hide_index=True)
+    display_recs = (
+        item_recs[view]
+        .sort_values(
+            "predicted_revenue_gain_pct",
+            ascending=False,
+            na_position="last"
+        )
+        .rename(
+            columns={
+                "store_id": "Store",
+                "current_price": "Current Price",
+                "recommended_price": "Recommended Price",
+                "price_change_pct": "Price Change %",
+                "predicted_revenue_gain_pct": "Predicted Revenue Change %",
+                "recommendation_reliability": "Reliability"
+            }
+        )
+    )
+
+    st.dataframe(
+        display_recs,
+        use_container_width=True,
+        hide_index=True
+    )
 else:
     artifact_missing(["portfolio_price_recommendations_enriched.csv"])
 

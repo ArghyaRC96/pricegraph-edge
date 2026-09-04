@@ -863,6 +863,59 @@ else:
 
 
 # ============================================================
+# LIVE SCENARIO STABILITY GUARDRAIL
+# ============================================================
+
+max_revenue_change_pct = float(
+    policy.get(
+        "max_display_revenue_change_pct",
+        100.0
+    )
+)
+
+max_demand_multiple = float(
+    policy.get(
+        "max_display_demand_multiple",
+        3.0
+    )
+)
+
+min_demand_multiple = float(
+    policy.get(
+        "min_display_demand_multiple",
+        1.0 / 3.0
+    )
+)
+
+demand_multiple = (
+    scenario_units
+    /
+    max(
+        current_units,
+        1e-9
+    )
+)
+
+unstable_live_scenario = (
+    revenue_change_pct
+    > max_revenue_change_pct
+    or
+    demand_multiple
+    > max_demand_multiple
+    or
+    demand_multiple
+    < min_demand_multiple
+)
+
+if unstable_live_scenario:
+    revenue_change_display = "WITHHELD"
+else:
+    revenue_change_display = (
+        f"{revenue_change_pct:+.2f}% vs current"
+    )
+
+
+# ============================================================
 # LIVE OUTPUT
 # ============================================================
 
@@ -911,6 +964,16 @@ with output_4:
         "CURRENT REVENUE",
         f"${current_revenue:,.2f}",
         "Model baseline"
+    )
+
+
+if unstable_live_scenario:
+
+    st.warning(
+        "Predicted revenue change percentage withheld. "
+        "The model response changes too sharply relative "
+        "to the current baseline. Review the absolute "
+        "predicted demand and revenue values instead."
     )
 
 
@@ -1149,96 +1212,183 @@ ripple_df = pd.DataFrame(
 )
 
 
-quantified = (
-    ripple_df[
-        ripple_df[
-            "Status"
-        ] == "QUANTIFIED"
-    ]
-    .copy()
-)
+if np.isclose(
+    proposed_price,
+    current_price,
+    atol=0.005
+):
 
-
-if not quantified.empty:
-
-    quantified[
-        "Absolute Impact"
-    ] = (
-        quantified[
-            "Estimated Demand Impact %"
-        ]
-        .abs()
+    st.info(
+        "Your scenario price is the same as the current price. "
+        "Move the slider or enter a different manual price "
+        "to see related-product ripple effects."
     )
 
+else:
 
     quantified = (
-        quantified
-        .sort_values(
-            "Absolute Impact",
-            ascending=True
-        )
+        ripple_df[
+            ripple_df[
+                "Status"
+            ] == "QUANTIFIED"
+        ]
+        .copy()
     )
 
 
-    ripple_fig = go.Figure()
+    if quantified.empty:
+
+        st.info(
+            "No related-product ripple can be quantified "
+            "for this particular price movement. "
+            "The relationship table below still shows "
+            "directional PriceGraph evidence."
+        )
+
+    else:
+
+        quantified[
+            "Absolute Impact"
+        ] = (
+            quantified[
+                "Estimated Demand Impact %"
+            ]
+            .abs()
+        )
 
 
-    ripple_fig.add_trace(
-        go.Bar(
-            x=
-                quantified[
-                    "Estimated Demand Impact %"
-                ],
+        quantified = (
+            quantified
+            .sort_values(
+                "Absolute Impact",
+                ascending=False
+            )
+            .head(10)
+        )
 
-            y=
-                quantified[
-                    "Related Product"
-                ],
 
-            orientation="h",
+        chart_data = (
+            quantified
+            .sort_values(
+                "Estimated Demand Impact %",
+                ascending=True
+            )
+        )
 
-            text=
-                quantified[
+
+        bar_colors = [
+            "#11888F"
+            if value > 0
+            else "#C94F86"
+            for value in chart_data[
+                "Estimated Demand Impact %"
+            ]
+        ]
+
+
+        max_abs_impact = max(
+            float(
+                chart_data[
                     "Estimated Demand Impact %"
                 ]
-                .map(
-                    lambda value:
-                    f"{value:+.2f}%"
-                ),
-
-            textposition="outside",
-
-            marker_color="#7467E8"
+                .abs()
+                .max()
+            ),
+            0.10
         )
-    )
 
 
-    ripple_fig.update_layout(
-        title="Estimated Related-Product Demand Ripple",
-        height=max(
-            360,
-            len(
-                quantified
+        ripple_fig = go.Figure()
+
+
+        ripple_fig.add_trace(
+            go.Bar(
+                x=
+                    chart_data[
+                        "Estimated Demand Impact %"
+                    ],
+
+                y=
+                    chart_data[
+                        "Related Product"
+                    ],
+
+                orientation="h",
+
+                text=
+                    chart_data[
+                        "Estimated Demand Impact %"
+                    ]
+                    .map(
+                        lambda value:
+                        f"{value:+.2f}%"
+                    ),
+
+                textposition="outside",
+
+                marker_color=
+                    bar_colors
             )
-            * 42
-        ),
-        margin=dict(
-            l=20,
-            r=20,
-            t=60,
-            b=20
-        ),
-        plot_bgcolor="rgba(0,0,0,0)",
-        paper_bgcolor="rgba(0,0,0,0)",
-        xaxis_title="Estimated demand change (%)",
-        yaxis_title=""
-    )
+        )
 
 
-    st.plotly_chart(
-        ripple_fig,
-        use_container_width=True
-    )
+        ripple_fig.update_layout(
+            title=
+                "Estimated Related-Product Demand Ripple",
+
+            height=max(
+                340,
+                len(chart_data)
+                * 58
+            ),
+
+            margin=dict(
+                l=20,
+                r=70,
+                t=60,
+                b=30
+            ),
+
+            plot_bgcolor=
+                "rgba(0,0,0,0)",
+
+            paper_bgcolor=
+                "rgba(0,0,0,0)",
+
+            xaxis_title=
+                "Estimated demand change (%)",
+
+            yaxis_title="",
+
+            xaxis=dict(
+                range=[
+                    -max_abs_impact * 1.30,
+                    max_abs_impact * 1.30
+                ],
+
+                zeroline=True,
+
+                zerolinewidth=2,
+
+                zerolinecolor=
+                    "#7A8294",
+
+                gridcolor=
+                    "rgba(100,110,130,0.10)"
+            )
+        )
+
+
+        st.plotly_chart(
+            ripple_fig,
+            use_container_width=True
+        )
+
+
+        st.caption(
+            "Positive values indicate estimated demand uplift. "
+            "Negative values indicate estimated demand pressure."
+        )
 
 
 ripple_display = (

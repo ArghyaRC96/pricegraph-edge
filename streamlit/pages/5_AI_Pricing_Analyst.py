@@ -30,7 +30,30 @@ hood = neigh[neigh["item_id"] == item].head(6).copy() if neigh is not None else 
 c1,c2,c3,c4 = st.columns(4)
 with c1: metric_card("Current", f'${row["current_price"]:.2f}', "Current observed price")
 with c2: metric_card("Recommended", f'${row["recommended_price"]:.2f}', "Supported model scenario")
-with c3: metric_card("Predicted Gain", f'{row["predicted_revenue_gain_pct"]:.2f}%', "Scenario revenue gain")
+safe_change = row.get(
+    "predicted_revenue_gain_pct",
+    float("nan")
+)
+
+if safe_change != safe_change:
+    revenue_change_display = "WITHHELD"
+    revenue_change_caption = (
+        "Unstable model response - review required"
+    )
+else:
+    revenue_change_display = (
+        f"{safe_change:.2f}%"
+    )
+    revenue_change_caption = (
+        "Predicted revenue change"
+    )
+
+with c3:
+    metric_card(
+        "Predicted Revenue Change",
+        revenue_change_display,
+        revenue_change_caption
+    )
 with c4: metric_card("Reliability", str(row["recommendation_reliability"]), "Transparent guardrail tier")
 
 section_header("ASK THE ANALYST","Turn model output into a concise business explanation.","Try: Why is this price recommended? What are the main risks? How should I interpret the connected products?")
@@ -53,7 +76,23 @@ facts = {
     "recommended_predicted_units": float(row["recommended_predicted_units"]),
     "current_predicted_revenue": float(row["current_predicted_revenue"]),
     "recommended_predicted_revenue": float(row["recommended_predicted_revenue"]),
-    "predicted_revenue_gain_pct": float(row["predicted_revenue_gain_pct"]),
+    "predicted_revenue_change_pct": (
+        None
+        if safe_change != safe_change
+        else float(safe_change)
+    ),
+    "raw_predicted_revenue_change_pct": float(
+        row.get(
+            "raw_predicted_revenue_gain_pct",
+            0.0
+        )
+    ),
+    "scenario_stability": str(
+        row.get(
+            "scenario_stability",
+            "STABLE"
+        )
+    ),
     "support_weeks": int(row["recommended_price_support_weeks"]),
     "reliability": str(row["recommendation_reliability"]),
 }

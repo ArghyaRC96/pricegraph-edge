@@ -53,7 +53,7 @@ with a:
     fig.update_layout(height=380, margin=dict(l=10,r=10,t=30,b=10), paper_bgcolor="rgba(0,0,0,0)", legend_title_text="")
     st.plotly_chart(fig, use_container_width=True)
 with b:
-    fig = px.histogram(work, x="predicted_revenue_gain_pct", nbins=35, labels={"predicted_revenue_gain_pct":"Predicted revenue gain (%)"})
+    fig = px.histogram(work, x="predicted_revenue_gain_pct", nbins=35, labels={"predicted_revenue_gain_pct":"Predicted Revenue Change (%)"})
     fig.update_traces(marker_color="#6C5CE7")
     fig.update_layout(height=380, margin=dict(l=10,r=10,t=30,b=10), paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(255,255,255,.55)")
     st.plotly_chart(fig, use_container_width=True)
@@ -62,7 +62,7 @@ section_header("TOP OPPORTUNITIES","Highest model-predicted revenue gains.","The
 top = work.nlargest(15, "predicted_revenue_gain_pct").sort_values("predicted_revenue_gain_pct")
 fig = px.bar(top, x="predicted_revenue_gain_pct", y="item_id", orientation="h", color="recommendation_reliability",
              color_discrete_map={"HIGH":"#12A67B","MEDIUM":"#6C5CE7","REVIEW":"#FF7A7A"},
-             labels={"predicted_revenue_gain_pct":"Predicted revenue gain (%)","item_id":"Product"})
+             labels={"predicted_revenue_gain_pct":"Predicted Revenue Change (%)","item_id":"Product"})
 fig.update_layout(height=470, paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(255,255,255,.55)", legend_title_text="Reliability")
 st.plotly_chart(fig, use_container_width=True)
 
