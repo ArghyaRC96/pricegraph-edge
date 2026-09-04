@@ -62,7 +62,6 @@ CHAMPION_FEATURES = (
 )
 
 
-@st.cache_data
 def load_csv(filename):
 
     path = PROCESSED_DATA / filename
