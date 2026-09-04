@@ -495,7 +495,7 @@ COMPLETE
 
 Documentation:
 
-FINALIZING
+COMPLETE
 
 Remaining:
 
@@ -503,3 +503,109 @@ Remaining:
 - final documentation commit
 - final push
 - confirm clean Git status
+
+## 27. Gemini Model Migration
+
+The deployed AI Pricing Analyst returned a provider 404 because gemini-2.5-flash was no longer available to new users.
+
+Updated default model:
+
+gemini-3.6-flash
+
+Only the Gemini model identifier changed.
+
+The pricing model, PriceGraph pipeline, prompts, and numerical decision logic were unchanged.
+
+Python compilation passed and the change was committed and deployed.
+
+## 28. Final Recommendation Guardrail Verification
+
+The deployed AI Pricing Analyst initially continued displaying an extreme recommendation:
+
+FOODS_1_012 / CA_3
+
+Observed stale display:
+
+- Predicted Revenue Change: 825.74%
+- Reliability: HIGH
+
+The local production artifact was inspected and confirmed correct:
+
+- predicted_revenue_gain_pct: withheld / NaN
+- raw_predicted_revenue_gain_pct: approximately 825.74%
+- predicted_demand_multiple: approximately 9.39
+- scenario_stability: REVIEW
+- recommendation_reliability: REVIEW
+
+This confirmed that the model guardrail and production artifact were correct.
+
+## 29. Streamlit CSV Cache Fix
+
+The deployed application was reading stale cached recommendation data.
+
+Root cause:
+
+load_csv() in streamlit/utils/data_loader.py used st.cache_data.
+
+Because deployment artifacts are compact, the generic CSV cache was removed.
+
+Result:
+
+Streamlit now reloads the current production recommendation artifact after deployment updates.
+
+The change compiled successfully, was committed, pushed, and redeployed.
+
+## 30. Final Production Smoke Test
+
+Final deployed smoke test:
+
+FOODS_1_012 / CA_3
+
+Expected and observed result:
+
+- Predicted Revenue Change: WITHHELD
+- Reliability: REVIEW
+
+This confirmed that:
+
+- the guarded production artifact is being loaded,
+- stale recommendation caching is resolved,
+- unstable model outputs are not presented as trustworthy commercial percentages,
+- raw values remain available for audit.
+
+## 31. Final Project Completion
+
+Live application:
+
+https://pricegraph-edge.streamlit.app/
+
+Final stack includes:
+
+- Walmart M5 retail data
+- Pandas
+- NumPy
+- scikit-learn
+- Poisson XGBoost
+- Plotly
+- NetworkX
+- Huber regression
+- Streamlit
+- Gemini 3.6 Flash
+- Git
+- GitHub
+
+Final project status:
+
+COMPLETE
+
+Final Git expectation:
+
+- branch: main
+- origin/main synchronized
+- working tree clean
+- notebooks committed
+- production artifacts committed
+- Streamlit application committed
+- README committed
+- project_state.md committed
+- build_log.md committed

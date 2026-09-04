@@ -20,7 +20,7 @@ Streamlit application: COMPLETE
 
 Streamlit Community Cloud deployment: COMPLETE
 
-Documentation: FINALIZING
+Documentation: COMPLETE
 
 ## Product Definition
 
@@ -323,3 +323,89 @@ Avoid claiming:
 - reinforcement-learning pricing
 - inventory optimization
 - profit optimization
+
+## Final Production Fixes
+
+### Gemini Model Migration
+
+The AI Pricing Analyst originally used:
+
+gemini-2.5-flash
+
+The provider retired that model for new users.
+
+Production was migrated to:
+
+gemini-3.6-flash
+
+The existing Gemini integration was retained because Gemini remains only a thin explanation layer over structured Data Science outputs.
+
+### Recommendation Stability Verification
+
+The production artifact was verified using:
+
+FOODS_1_012 / CA_3
+
+Verified artifact state:
+
+- raw predicted revenue change: approximately 825.74%
+- production displayed percentage: WITHHELD
+- recommendation reliability: REVIEW
+- scenario stability: REVIEW
+
+The raw model output is preserved for audit while the unstable percentage is withheld from users.
+
+### Streamlit Artifact Cache Fix
+
+The local production artifact contained the correct guarded values, but the deployed Streamlit application initially continued showing stale recommendation data.
+
+Root cause:
+
+The generic CSV loader was cached with st.cache_data.
+
+Production fix:
+
+Caching was removed from load_csv() for compact deployment CSV artifacts.
+
+This ensures refreshed recommendation artifacts are read from disk after deployment updates.
+
+Final deployed smoke test confirmed:
+
+- Predicted Revenue Change: WITHHELD
+- Reliability: REVIEW
+
+for the known unstable FOODS_1_012 / CA_3 scenario.
+
+## Final Project Status
+
+PriceGraph Edge is complete.
+
+Completed components:
+
+- Data preparation
+- Exploratory analysis
+- Leakage-safe feature engineering
+- Temporal validation
+- Poisson XGBoost demand model
+- Safe supported-price simulation
+- User-controlled live price simulation
+- Portfolio recommendation engine
+- Recommendation reliability guardrails
+- Production model-stability guardrails
+- PriceGraph cross-product analysis
+- Huber cross-price ripple models
+- Streamlit application
+- Gemini 3.6 Flash explanation layer
+- Streamlit Community Cloud deployment
+- README
+- Project state log
+- Build log
+- GitHub synchronization
+
+Live application:
+
+https://pricegraph-edge.streamlit.app/
+
+Final repository state:
+
+main synced with origin/main and working tree clean.
