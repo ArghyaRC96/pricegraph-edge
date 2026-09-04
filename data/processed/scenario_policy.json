@@ -1,0 +1,9 @@
+{
+    "supported_price_lookback_weeks": 52,
+    "minimum_supported_price_weeks": 4,
+    "extended_price_change_lower_pct": -38.59091408079625,
+    "extended_price_change_upper_pct": 62.620833333333394,
+    "ripple_elasticity_lower": -5.504521024274022,
+    "ripple_elasticity_upper": 3.801313542541984,
+    "outside_evidence_behavior": "Disable quantitative scenario prediction"
+}
