@@ -9,7 +9,7 @@ import plotly.express as px
 from utils.ui import inject_theme, page_header, metric_card, section_header, artifact_missing
 from utils.data_loader import load_app_data
 
-st.set_page_config(page_title="Pricing Command Center", page_icon="📊", layout="wide")
+st.set_page_config(page_title="Pricing Command Center", page_icon="P", layout="wide")
 inject_theme()
 page_header("PORTFOLIO INTELLIGENCE","Pricing Command Center","Scan the portfolio, filter decisions, and surface the highest model-predicted pricing opportunities.")
 data = load_app_data()

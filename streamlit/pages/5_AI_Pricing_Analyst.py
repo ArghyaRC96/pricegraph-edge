@@ -11,7 +11,7 @@ from google import genai
 from utils.ui import inject_theme, page_header, metric_card, section_header, artifact_missing
 from utils.data_loader import load_app_data
 
-st.set_page_config(page_title="AI Pricing Analyst", page_icon="✨", layout="wide")
+st.set_page_config(page_title="AI Pricing Analyst", page_icon="P", layout="wide")
 inject_theme()
 page_header("EXPLANATION LAYER","AI Pricing Analyst","Gemini explains model outputs and graph evidence. It does not calculate prices, retrain the model, or invent causal claims.")
 data = load_app_data()

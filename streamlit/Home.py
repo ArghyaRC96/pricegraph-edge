@@ -2,7 +2,7 @@ import streamlit as st
 from utils.ui import inject_theme, hero, metric_card, section_header
 from utils.data_loader import load_app_data, artifact_status
 
-st.set_page_config(page_title="PriceGraph Edge", page_icon="📈", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="PriceGraph Edge", page_icon=":chart_with_upwards_trend:", layout="wide", initial_sidebar_state="expanded")
 inject_theme()
 data = load_app_data()
 hero()
@@ -21,7 +21,7 @@ with c4: metric_card("Connected Products", f"{connected}", "Products linked insi
 
 section_header("MODEL PERFORMANCE","The forecast engine earned its seat.","Final Poisson XGBoost results on the untouched 52-week holdout.")
 m1,m2,m3,m4 = st.columns(4)
-with m1: metric_card("R²","0.845","Untouched 52-week test")
+with m1: metric_card("R2","0.845","Untouched 52-week test")
 with m2: metric_card("MAE","9.78","Mean Absolute Error")
 with m3: metric_card("RMSE","21.95","Root Mean Squared Error")
 with m4: metric_card("WAPE","31.38%","Weighted Absolute Percentage Error")
