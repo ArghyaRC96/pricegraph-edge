@@ -133,7 +133,7 @@ User question:
 """
         try:
             client = genai.Client(api_key=api_key)
-            model_name = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+            model_name = os.getenv("GEMINI_MODEL", "gemini-3.6-flash")
             with st.spinner("Reading the model evidence..."):
                 response = client.models.generate_content(model=model_name, contents=prompt)
             st.markdown("### Analyst brief")
